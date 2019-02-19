@@ -9,7 +9,7 @@ def main():
   resonse = urllib2.urlopen(url)
   raw = resonse.read().decode('utf8')
 
-  with open("corpus.json") as corpus_file:
+  with open("./src/corpus.json") as corpus_file:
     data = json.load(corpus_file)
 
   print(dictionary.create_dictionary(data))

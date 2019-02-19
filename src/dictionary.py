@@ -7,9 +7,6 @@ from normalization import normalize
 import json
 
 def create_dictionary(data):
-    nltk.download('punkt')
-
-
     tokens = word_tokenize(str(data))
     tokenText = nltk.Text(tokens)
     alphaTokens = normalize(tokens)
