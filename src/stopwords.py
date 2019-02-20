@@ -7,4 +7,5 @@ def remove_stopword(tokens):
     # import the stopwords
     from nltk.corpus import stopwords
     filtered_tokens = [t for t in tokens if t not in stopwords.words('english')]
+    print(filtered_tokens)
     return filtered_tokens

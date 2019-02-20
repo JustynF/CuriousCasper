@@ -1,7 +1,11 @@
 import booleanretreival as boolModel
-import dictionary as dictionary
+from dictionary import Dictionary
 import urllib2
 import json
+
+from stopwords import remove_stopword
+from normalization import normalize
+from stemmer import stemmer
 
 def main():
 
@@ -12,7 +16,7 @@ def main():
   with open("./src/corpus.json") as corpus_file:
     data = json.load(corpus_file)
 
-  print(dictionary.create_dictionary(data))
-
+  dict = Dictionary(data,normalize,stemmer,remove_stopword)
+  print(type(dict.create_dictionary()))
 if __name__== "__main__":
   main()
