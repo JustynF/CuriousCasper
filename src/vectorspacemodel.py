@@ -3,6 +3,10 @@ import math
 from collections import Counter, defaultdict
 from sklearn.feature_extraction.text import TfidfVectorizer
 import re
+import os
+import csv
+from functools import reduce
+import time
 
 class VectorSpaceModel:
 
@@ -16,6 +20,16 @@ class VectorSpaceModel:
 
     def words(self, s):
         return re.findall(r"\w+", s, re.UNICODE | re.IGNORECASE)
+
+    def create_inverted_index(self, tokenDict):
+        counter = 0
+        for value in tokenDict:
+            if isinstance(value, int):
+                counter = value
+                if value not in self.inverted_index:
+                    if counter not in self.inverted_index[value]:
+                        self.inverted_index[value].append(counter)
+
 
     def calculate_idf(self, inverted_index):
         N = len(self.corpus)
