@@ -4,12 +4,11 @@ from nltk.stem.snowball import EnglishStemmer  # Assuming we're working with Eng
 
 
 class Index:
-    def __init__(self, corpus,dict):
+    def __init__(self,dict):
 
         self.index = defaultdict(list)
         self.documents = {}
         self.__unique_id = 0
-        self.corpus = corpus
         self.dict = dict
 
     def lookup(self, word):
@@ -22,19 +21,13 @@ class Index:
 
         return [self.documents.get(id, None) for id in self.index.get(word)]
 
-    def add(self, document):
+    def add(self, doc):
         """
         Add a document string to the index
         """
-        for token in dict:
+        for token in self.dict:
+            if token in doc["title"] or token in doc["text"]:
+                if doc["docId"] not in self.index[token.encode("utf-8")]:
+                    self.index[token.encode("utf-8")].append(doc["docId"])
 
-            if self.__unique_id not in self.index[token]:
-                self.index[token].append(self.__unique_id)
-
-        self.documents[self.__unique_id] = document
-        self.__unique_id += 1
-
-
-index = Index(nltk.word_tokenize,
-              EnglishStemmer(),
-              nltk.corpus.stopwords.words('english'))
+            self.documents[doc["docId"]] = doc

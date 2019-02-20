@@ -1,12 +1,7 @@
 import json
 import math
 from collections import Counter, defaultdict
-from sklearn.feature_extraction.text import TfidfVectorizer
 import re
-import os
-import csv
-from functools import reduce
-import time
 
 class VectorSpaceModel:
 

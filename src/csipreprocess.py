@@ -1,13 +1,13 @@
-from abstractpreprocess import AbstractPreProcess
 import json
 import requests
 from bs4 import BeautifulSoup
+from collections import namedtuple
 
-
-class csiPreprocess(AbstractPreProcess):
+class csiPreprocess():
     def __init__(self):
-        super().__init__()
         self.url = "https://catalogue.uottawa.ca/en/courses/csi/"
+        self.document = namedtuple("document","docId title text")
+        self.list = []
 
     def preprocess(self):
         results = requests.get(self.url)
@@ -17,15 +17,15 @@ class csiPreprocess(AbstractPreProcess):
             title = courseblock.find('p', attrs={'class': 'courseblocktitle'})
             desc = courseblock.find('p', attrs={'class': 'courseblockdesc'})
             if desc is not None:
-                new_document = self.document(f'{i}', title.text, desc.text.strip())
+                new_document = self.document(i, title.text.encode('utf-8'), desc.text.encode('utf-8').strip())
             else:
-                new_document = self.document(f'{i}', title.text, '')
+                new_document = self.document(i, title.text.encode('utf-8'), '')
             self.list.append(new_document)
 
         uniform_dicts = [list._asdict()
                          for list in self.list]
 
-        with open('corpus.json', 'w', encoding="utf-8") as outfile:
+        with open('./src/corpus.json', 'wb',) as outfile:
             json.dump(uniform_dicts, outfile, ensure_ascii=False, indent=4)
 
 
