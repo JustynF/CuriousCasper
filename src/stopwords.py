@@ -1,5 +1,4 @@
-import  nltk
-
+import nltk
 
 
 def remove_stopword(tokens):
