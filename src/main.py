@@ -26,10 +26,16 @@ def main():
   index = Index()
 
   index.create_index()
-  words = index.get_index()
+  inv_index_words = index.get_index()
 
-  boolean_model = BooleanModel(words)
+  print(inv_index_words["problem"])
 
+  bm = BooleanModel(inv_index_words)
+
+
+  print(bm.process_query("Problem OR solving"))
+
+  print(bm.process_query("problem AND solving"))
 
 
 if __name__== "__main__":

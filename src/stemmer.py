@@ -6,6 +6,6 @@ import re
 
 def stemmer(tokens):
     stemmer = PorterStemmer()
-    singles = [stemmer.stem(t) for t in tokens]
-    print(singles)
-    return singles
+    if(type(tokens)==str):
+        return stemmer.stem(str(tokens))
+    return [stemmer.stem(t) for t in tokens]
