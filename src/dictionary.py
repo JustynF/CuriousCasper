@@ -5,8 +5,10 @@ from nltk.stem.porter import *
 import json
 
 class Dictionary:
-    def __init__(self,data,normalizer= None, stemmer = None, stopwords = None):
-        self.data = data
+    def __init__(self,normalizer= None, stemmer = None, stopwords = None):
+        with open("./src/corpus.json") as corpus_file:
+            self.data = json.load(corpus_file)
+
         self.get_normalizer = normalizer
         self.get_stemmer = stemmer
         self.get_stopwords = stopwords
@@ -30,6 +32,8 @@ class Dictionary:
 
     def create_dictionary(self):
         res = self.stemTokens
+        with open("./src/output/dictionary.json", 'wb') as outfile:
+            json.dump(res, outfile)
         return res
 
 

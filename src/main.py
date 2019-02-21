@@ -9,6 +9,7 @@ from stemmer import stemmer
 from csipreprocess import csiPreprocess
 
 from invertedindex import Index
+from booleanretreival import BooleanModel
 
 def main():
 
@@ -18,19 +19,18 @@ def main():
 
   corpusaccess = Access()
 
+  dict = Dictionary(normalize,stemmer,remove_stopword)
 
-  with open("./src/corpus.json") as corpus_file:
-    data = json.load(corpus_file)
-  dict = Dictionary(data,normalize,stemmer,remove_stopword)
+  dict.create_dictionary()
+
+  index = Index()
+
+  index.create_index()
+  words = index.get_index()
+
+  boolean_model = BooleanModel(words)
 
 
-
-  index = Index(dict.create_dictionary())
-
-  for doc in data:
-    index.add(doc)
-
-  print(str(index.index))
 
 if __name__== "__main__":
   main()
