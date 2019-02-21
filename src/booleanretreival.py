@@ -1,6 +1,7 @@
 from bitmap import BitMap
 import json
 import collections
+import nltk
 from stemmer import stemmer
 
 
@@ -9,6 +10,9 @@ class BooleanModel:
         with open('./src/output/corpus.json') as corpus:
             docs = json.load(corpus)
         self.all_doc_id = {document['docId'] for document in docs}
+        with open("./src/output/dictionary.json") as dictionary:
+            self.dict = json.load(dictionary)
+
         self.inverted_index = inv_index
         self.operators = ["AND","OR","NOT"]
         self.query_operators = []
@@ -20,12 +24,11 @@ class BooleanModel:
         query = query.replace(')', ' )')
         query = query.split(' ')
 
-        
-        
-        postfix_queue = collections.deque(self.query_to_postfix(query))
-        with open("./src/output/dictionary.json") as dictionary:
-            dict = json.load(dictionary)
 
+
+        postfix_queue = collections.deque(self.query_to_postfix(query))
+
+        dict = self.dict
 
         while postfix_queue:
             token = postfix_queue.popleft()
@@ -33,8 +36,9 @@ class BooleanModel:
                 self.query_operators.append(token)
             else:
                     if "*" in token:
-                        ngram = self.create_ngram_model(token,self.inverted_index)
-                        print(ngram)
+                        set_of_words = self.find_wildcard(token,self.handle_wildcard(token))
+                        wildcard_query = ' OR '.join(set_of_words)
+                        self.queries.append(self.process_query(wildcard_query))
                     else:
                         token = stemmer(token).encode("utf-8")
                         if token in dict:
@@ -88,18 +92,68 @@ class BooleanModel:
         else:
             return set(s2).union(s1)
 
+
     def create_ngram_model(self,token,index):
-        ngrams = [token[i:i+2]for i in range(1,len(token) - 1,2)]
+        ngrams = list(nltk.bigrams(token))
 
-        print(ngrams)
-        ngrams.append(token[0])
-        print(ngrams)
-        ngrams.append(token[-1])
+        ngrams = map(self.combineTuples,ngrams)
 
-        ngrams = [''.join(n for n in ngram if n not in '*') for ngram in ngrams]
-        print(ngrams)
+        ngram_model = {ngram: [i for i in index.keys() if ngram in i] for ngram in ngrams}
 
-        return {ngram: [word for word in index.keys() if ngram in index] for ngram in ngrams}
+        return ngram_model
+
+    def combineTuples(self,tuple):
+
+        t1 = (str(tuple[0]) if str(tuple[0]) not in '*' else '')
+        t2 = (str(tuple[1]) if str(tuple[1]) not in '*' else '')
+
+        string_tuple = t1+t2
+
+        return string_tuple
+
+    def handle_wildcard(self,token):
+        ngram = self.create_ngram_model(token, self.inverted_index)
+        res = set()
+
+        for _,arr in ngram.iteritems():
+            if len(res) == 0:
+                res.update(arr)
+            else:
+                res.intersection(arr)
+
+        return list(res)
+
+
+
+    def find_wildcard(self,token,set_of_words):
+        result = []
+
+        if token.startswith('*'):
+            for word in set_of_words:
+                if word.endswith(token[1:]):
+                    result.append(word)
+
+        elif token.endswith('*'):
+            for word in set_of_words:
+                if word.startswith(token[:len(token)-1]):
+                    result.append(word)
+        else:
+            token_tuple = token.split('*')
+
+            for index, split in enumerate(token_tuple):
+                if index == 0:
+                    for word in set_of_words:
+                        if word.startswith(split):
+                            result.append(word)
+                elif index == len(split) - 1:
+                    for word in set_of_words:
+                        if word.endswith(split):
+                            result.append(word)
+                else:
+                    for word in set_of_words:
+                        if split in word:
+                            result.append(word)
+        return result
 
 
 

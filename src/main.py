@@ -35,7 +35,8 @@ def main():
 
   print(bm.process_query("Problem OR solving"))
 
-  print(bm.process_query("problem AND solving"))
+  print("query")
+  print(bm.process_query("solv*"))
 
 
 if __name__== "__main__":
