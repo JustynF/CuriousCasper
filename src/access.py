@@ -3,10 +3,17 @@ from csipreprocess import csiPreprocess
 
 class Access:
     def __init__(self):
-        with open("./src/corpus.json", "r") as corpus_file:
+        with open("./src/output/corpus.json", "r") as corpus_file:
             self.corpus = json.load(corpus_file)
 
-    def corpus_access(self, docid):
+    def get_document(self, docid):
         for doc in self.corpus:
             if doc['docId'] == docid:
-                return doc['title']
+                return doc
+
+    def get_doc_ids(self):
+        res=[]
+        for doc in self.corpus:
+            res.append(doc['docId'])
+        return res
+

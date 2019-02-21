@@ -25,7 +25,7 @@ class csiPreprocess():
         uniform_dicts = [list._asdict()
                          for list in self.list]
 
-        with open('./src/corpus.json', 'wb',) as outfile:
+        with open('./src/output/corpus.json', 'wb',) as outfile:
             json.dump(uniform_dicts, outfile, ensure_ascii=False, indent=4)
 
 
