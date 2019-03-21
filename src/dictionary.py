@@ -3,6 +3,7 @@ from nltk import word_tokenize
 from nltk.stem import *
 from nltk.stem.porter import *
 import json
+from collections import namedtuple
 
 class Dictionary:
     def __init__(self,normalizer= None, stemmer = None, stopwords = None):
@@ -31,10 +32,12 @@ class Dictionary:
             self.stemTokens = stemmer(self.stopTokens)
 
     def create_dictionary(self):
-        res = self.stemTokens
+        words = self.stemTokens
+
+        words = list(set(words))
         with open("./src/output/dictionary.json", 'wb') as outfile:
-            json.dump(res, outfile)
-        return res
+            json.dump(words, outfile, ensure_ascii=False, indent=4)
+        return words
 
 
 
