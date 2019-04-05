@@ -5,12 +5,13 @@ import nltk
 from stemmer import stemmer
 
 
+
 class BooleanModel:
     def __init__(self, inv_index):
-        with open('./src/output/corpus.json') as corpus:
+        with open('src/output/corpus.json') as corpus:
             docs = json.load(corpus)
         self.all_doc_id = {document['docId'] for document in docs}
-        with open("./src/output/dictionary.json") as dictionary:
+        with open("src/output/dictionary.json") as dictionary:
             self.dict = json.load(dictionary)
 
         self.inverted_index = inv_index
@@ -174,11 +175,9 @@ class BooleanModel:
 
         # while there are tokens to be read
         for token in infix_query:
-
             # if left bracket
             if (token == '('):
                 operator_stack.append(token)
-
             elif (token == ')'):
                 operator = operator_stack.pop()
                 while operator != '(':

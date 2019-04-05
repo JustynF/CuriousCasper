@@ -32,11 +32,7 @@ def main():
 
   bm = BooleanModel(inv_index_words)
 
-
-  print(bm.process_query("Problem OR solving"))
-
-  print("query")
-  print(bm.process_query("solv*"))
+  print(bm.process_query("solv*g"))
 
 
 if __name__== "__main__":
