@@ -9,20 +9,10 @@ class Index:
         self.index = defaultdict(list)
         self.documents = {}
         self.__unique_id = 0
-        with open("./src/output/dictionary.json",'rb') as dict_file:
+        with open("src/output/dictionary.json",'rb') as dict_file:
             self.dict = json.load(dict_file)
-        with open("./src/output/corpus.json") as corpus_file:
+        with open("src/output/corpus.json") as corpus_file:
             self.corpus = json.load(corpus_file)
-
-    def lookup(self, word):
-        """
-        Lookup a word in the index
-        """
-        word = word.lower()
-        if self.stemmer:
-            word = self.stemmer.stem(word)
-
-        return [self.documents.get(id, None) for id in self.index.get(word)]
 
     def add(self, doc):
         for token in self.dict:

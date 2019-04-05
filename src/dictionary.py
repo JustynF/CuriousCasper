@@ -7,9 +7,8 @@ from collections import namedtuple
 
 class Dictionary:
     def __init__(self,normalizer= None, stemmer = None, stopwords = None):
-        with open("./src/corpus.json") as corpus_file:
+        with open("src/output/corpus.json") as corpus_file:
             self.data = json.load(corpus_file)
-
         self.get_normalizer = normalizer
         self.get_stemmer = stemmer
         self.get_stopwords = stopwords
@@ -35,9 +34,10 @@ class Dictionary:
         words = self.stemTokens
 
         words = list(set(words))
-        with open("./src/output/dictionary.json", 'wb') as outfile:
+        with open("src/output/dictionary.json", 'wb') as outfile:
             json.dump(words, outfile, ensure_ascii=False, indent=4)
         return words
+
 
 
 
