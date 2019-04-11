@@ -1,8 +1,7 @@
-from bitmap import BitMap
 import json
 import collections
 import nltk
-from stemmer import stemmer
+from src.Helper.stemmer import stemmer
 
 
 
@@ -11,6 +10,7 @@ class BooleanModel:
         with open('src/output/corpus.json') as corpus:
             docs = json.load(corpus)
         self.all_doc_id = {document['docId'] for document in docs}
+
         with open("src/output/dictionary.json") as dictionary:
             self.dict = json.load(dictionary)
 
@@ -24,8 +24,6 @@ class BooleanModel:
         query = query.replace('(', '( ')
         query = query.replace(')', ' )')
         query = query.split(' ')
-
-
 
         postfix_queue = collections.deque(self.query_to_postfix(query))
 
@@ -124,8 +122,6 @@ class BooleanModel:
 
         return list(res)
 
-
-
     def find_wildcard(self,token,set_of_words):
         result = []
 
@@ -156,10 +152,6 @@ class BooleanModel:
                             result.append(word)
         return result
 
-
-
-
-
     def query_to_postfix(self,infix_query):
         # define precedences
         precedence = {}
@@ -169,11 +161,9 @@ class BooleanModel:
         precedence['('] = 0
         precedence[')'] = 0
 
-        # declare data strucures
         output = []
         operator_stack = []
 
-        # while there are tokens to be read
         for token in infix_query:
             # if left bracket
             if (token == '('):

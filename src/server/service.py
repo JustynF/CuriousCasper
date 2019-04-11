@@ -1,4 +1,9 @@
-from src import access,stopwords,normalization,stemmer,csipreprocess,invertedindex,booleanretreival,dictionary
+from src.Helper import stemmer, normalization, stopwords
+from src.InvertedIndex import invertedindex
+from src.Dictionary import dictionary
+from src.CorpusAccess import corpusaccess
+from src.BooleanModel import booleanretreival
+
 
 class Service:
     def __init__(self,n = None,s = None,stp = None):
@@ -7,7 +12,7 @@ class Service:
         self.bool_model = self.create_bool_model()
 
     def create_corpus(self):
-        corpus = csipreprocess.csiPreprocess()
+        corpus = corpusaccess.csiPreprocess()
         corpus.preprocess()
 
     def create_dictionary(self,normalizer,stem,stop):
@@ -21,7 +26,7 @@ class Service:
 
         stp = stopwords.remove_stopword if stop else None
 
-        d = dictionary.Dictionary(n,s,stp)
+        d = dictionary.Dictionary(n, s, stp)
         d.create_dictionary()
         return d
 

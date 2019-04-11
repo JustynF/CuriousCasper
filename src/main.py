@@ -1,17 +1,16 @@
-import booleanretreival as boolModel
-from dictionary import Dictionary
-import json
+from src.Dictionary.dictionary import Dictionary
 
-from access import Access
-from stopwords import remove_stopword
-from normalization import normalize
-from stemmer import stemmer
-from csipreprocess import csiPreprocess
+from src.CorpusAccess.access import Access
+from src.Helper.stopwords import remove_stopword
+from src.Helper.normalization import normalize
+from src.Helper.stemmer import stemmer
+from src.CorpusAccess.corpusaccess import csiPreprocess
 
-from invertedindex import Index
-from booleanretreival import BooleanModel
+from src.InvertedIndex.invertedindex import Index
+from src.BooleanModel.booleanretreival import BooleanModel
 
 def main():
+  #Start of the Pipeline
 
   #Corpus Preprocess
   corpus = csiPreprocess()
