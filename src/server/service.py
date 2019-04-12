@@ -1,29 +1,26 @@
 from src.Helper import stemmer, normalization, stopwords
-from src.InvertedIndex import invertedindex
-from src.Dictionary import dictionary
-from src.CorpusAccess import corpusaccess
-from src.BooleanModel import booleanretreival
+from src.Modules.InvertedIndex import invertedindex
+from src.Modules.Dictionary import dictionary
+from src.Modules.Corpus import preprocess
+from src.Modules.BooleanModel import booleanretreival
 
 
 class Service:
-    def __init__(self,n = None,s = None,stp = None):
-        self.dict = self.create_dictionary(n,s,stp)
+    def __init__(self,mode):
+        self.dict = self.create_dictionary(mode)
         self.index = self.create_inv_index()
         self.bool_model = self.create_bool_model()
 
     def create_corpus(self):
-        corpus = corpusaccess.csiPreprocess()
+        corpus = preprocess.csiPreprocess()
         corpus.preprocess()
 
-    def create_dictionary(self,normalizer,stem,stop):
+    def create_dictionary(self,mode):
 
         self.create_corpus()
 
-
         n = normalization.normalize if normalizer else None
-
         s = stemmer.stemmer if stem else None
-
         stp = stopwords.remove_stopword if stop else None
 
         d = dictionary.Dictionary(n, s, stp)

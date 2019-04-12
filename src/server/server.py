@@ -14,8 +14,8 @@ def getQuery():
     data = request.json
 
     query = data['query']
-    s = n = sp =""
-    service = Service(s,n,sp)
+    mode = data['mode']
+    service = Service(mode)
     list = service.bool_model.process_query(str(query))
     print(list)
     return str(list)
