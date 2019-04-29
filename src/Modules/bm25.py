@@ -6,12 +6,15 @@ from src.Helper.normalization import normalize
 from os.path import dirname
 import string
 from math import log, sqrt
+from collections import defaultdict
+
 k1 = 1.2
 k2 = 100
 b = 0.75
 ALPHA = 1
 BETA = 0.75
 GAMMA = 0.15
+
 
 class DocumentLengthTable:
 
@@ -63,8 +66,11 @@ class BM25():
 
 
 
-    def process_query(self, query, mode='default'):
+    def process_query(self, query, mode='default',feedback=False):
+        self.mode = mode
+        rel_docs = get_rel_docs(query,self.rel_docs)
         query = [word for word in word_tokenize(query) if word not in string.punctuation]
+
         if (mode == "normalize"):
             query_tokens = normalize(query)
             query = " ".join(query_tokens)
@@ -79,20 +85,27 @@ class BM25():
             query = " ".join(query_tokens)
 
         tokens = word_tokenize(query)
-
+        qf_list = compute_query_freq(tokens)
         query_result = dict()
         for term in tokens:
             if term in self.inv_index_freq:
+                qf = qf_list[term]
                 doc_dict = self.inv_index_freq[term]  # retrieve index entry
+                r = compute_r(self.inv_index_freq[term],rel_docs)
                 for docid, freq in doc_dict.iteritems():  # for each document and its word frequency
-                    score = score_BM25(n=len(doc_dict), f=freq, qf=1, r=0, N=len(self.dlt),
+                    score = score_BM25(n=len(doc_dict), f=freq, qf=qf, r=r, N=len(self.dlt),
                                        dl=self.dlt.get_length(docid),
-                                       avdl=self.dlt.get_average_length())  # calculate score
+                                       avdl=self.dlt.get_average_length(),
+                                       R=len(rel_docs))  # calculate score
                     if docid in query_result:  # this document has already been scored once
                         query_result[docid] += score
                     else:
                         query_result[docid] = score
-        return query_result
+
+        if not feedback:
+            return self.pseudoRelevanceFeedbackScores(query_result,tokens)
+        else:
+            return query_result
 
 
     def get_dlt(self):
@@ -104,16 +117,20 @@ class BM25():
             dlt.add(docid, length)
         return dlt
 
+    def pseudoRelevanceFeedbackScores(self,sortedBM25Score, query):
 
-k1 = 1.2
-k2 = 100
-b = 0.75
-R = 0.0
+        queryFreq = compute_query_freq(query)
+        relIndex = find_docs(sortedBM25Score, self.doc_text, "Relevant")
+        relDocMag = find_doc_mag(relIndex)
+        nonRelIndex = find_docs(sortedBM25Score, self.doc_text, "non-relevant")
+        nonRelMag = find_doc_mag(nonRelIndex)
+        newQuery = expand_query(query, queryFreq, relDocMag, relIndex, nonRelMag, nonRelIndex, self.inv_index_freq)
+        PseudoRelevanceScoreList = self.process_query(newQuery.encode("utf-8"),mode=self.mode,feedback=True)
+        return PseudoRelevanceScoreList
 
 
 
-
-def score_BM25(n, f, qf, r, N, dl, avdl):
+def score_BM25(n, f, qf, r, N, dl, avdl,R=0.0):
     K = compute_K(dl, avdl)
     first = log(((r + 0.5) / (R - r + 0.5)) / ((n - r + 0.5) / (N - n - R + r + 0.5)))
     second = ((k1 + 1) * f) / (K + f)
@@ -124,8 +141,39 @@ def score_BM25(n, f, qf, r, N, dl, avdl):
 def compute_K(dl, avdl):
     return k1 * ((1 - b) + b * (float(dl) / float(avdl)))
 
+def find_docs(sortedBM25Score, invertedIndex, relevancy):
+    relIndex = defaultdict(lambda: 0)
 
-def findRelDocMagnitude(docIndex):
+    if relevancy == "Relevant":
+        for doc,score in sortedBM25Score.items()[:5]:
+            relIndex = compute_doc_count(doc, relIndex, invertedIndex)
+        return relIndex
+    else:
+        for doc,score in sortedBM25Score.items()[6:]:
+            relIndex = compute_doc_count(doc, relIndex, invertedIndex)
+        return relIndex
+
+
+def compute_doc_count(doc, new_inv_index, doc_text):
+    for term in doc_text[doc]:
+        if term in new_inv_index.keys():
+            new_inv_index[term] += 1
+        else:
+            new_inv_index[term] = 1
+    return new_inv_index
+
+def compute_query_freq(query):
+    queryFreq = defaultdict(lambda :0)
+    for term in query:
+        if term in queryFreq.keys():
+            queryFreq[term] += 1
+        else:
+            queryFreq[term] = 1
+
+    return queryFreq
+
+
+def find_doc_mag(docIndex):
     mag = 0
     for term in docIndex:
         mag += float(docIndex[term]**2)
@@ -133,50 +181,38 @@ def findRelDocMagnitude(docIndex):
     return mag
 
 
-def findNonRelDocMagnitude(docIndex):
-    mag = 0
-    for term in docIndex:
-        mag += float(docIndex[term]**2)
-    mag = float(sqrt(mag))
-    return mag
+def compute_roccio(term, queryFreq, relDocMag, relIndex, nonRelMag, nonRelIndex):
+    rocchio_score = ALPHA * queryFreq[term] + (BETA/relDocMag) * relIndex[term] - (GAMMA/nonRelMag) * nonRelIndex[term]
+    return rocchio_score
 
+def compute_r(doc_list,rel_doc_list):
+    count = 0
+    for doc in rel_doc_list.keys():
+        if doc in doc_list:
+            count+=1
+    return count
 
-def findRocchioScore(term, queryFreq, relDocMag, relIndex, nonRelMag, nonRelIndex):
-    Q1 = ALPHA * queryFreq[term]
-    Q2 = (BETA/relDocMag) * relIndex[term]
-    Q3 = (GAMMA/nonRelMag) * nonRelIndex[term]
-    rocchioScore = ALPHA * queryFreq[term] + (BETA/relDocMag) * relIndex[term] - (GAMMA/nonRelMag) * nonRelIndex[term]
-    return rocchioScore
-
-
-def findNewQuery(query, queryFreq, relDocMag, relIndex, nonRelMag, nonRelIndex, invertedIndex):
+def get_rel_docs(query,rel_list):
+    if query in rel_list.keys():
+        return rel_list[query]
+    else:
+        return {}
+     
+def expand_query(query, queryFreq, relDocMag, relIndex, nonRelMag, nonRelIndex, invertedIndex):
     updatedQuery = {}
     newQuery = query
     for term in invertedIndex:
-        updatedQuery[term] = findRocchioScore(term, queryFreq, relDocMag, relIndex, nonRelMag, nonRelIndex)
+        updatedQuery[term] = compute_roccio(term, queryFreq, relDocMag, relIndex, nonRelMag, nonRelIndex)
     sortedUpdatedQuery = sorted(updatedQuery.items(), key=lambda x:x[1], reverse=True)
-    if len(sortedUpdatedQuery)<20:
-        loopRange = len(sortedUpdatedQuery)
+    if len(sortedUpdatedQuery)<10:
+        new_query_terms = len(sortedUpdatedQuery)
     else:
-        loopRange = 20
-    for i in range(loopRange):
-        term,frequency = sortedUpdatedQuery[i]
-        if term not in query:
-            newQuery +=  " "
-            newQuery +=  term
-    return newQuery
+        new_query_terms = 10
+    for term in sortedUpdatedQuery[:new_query_terms]:
+        if term[0] not in query:
+            newQuery.append(term[0])
+
+    return " ".join(newQuery)
 
 
-def pseudoRelevanceFeedbackScores(sortedBM25Score, query, invertedIndex, docLengths, relevant_list, queryID):
-    global feedbackFlag
-    feedbackFlag += 1
-    newQuery = query
-    k = 10 # top 10 documents to be taken as relevant
-    queryFreq = queryFrequency(query, invertedIndex)
-    relIndex = findDocs(k, sortedBM25Score, invertedIndex, "Relevant")
-    relDocMag = findRelDocMagnitude(relIndex)
-    nonRelIndex = findDocs(k, sortedBM25Score, invertedIndex, "Non-Relevant")
-    nonRelMag = findNonRelDocMagnitude(nonRelIndex)
-    newQuery = findNewQuery(query, queryFreq, relDocMag, relIndex, nonRelMag, nonRelIndex, invertedIndex)
-    PseudoRelevanceScoreList = findDocumentsForQuery(newQuery, invertedIndex, docLengths, queryID)
-    return PseudoRelevanceScoreList
+
