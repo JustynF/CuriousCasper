@@ -12,7 +12,7 @@ class Access:
         with open(directory+"/output/knn_corpus_reuters.json", "r") as corpus_file:
             self.corpus_knn = json.load(corpus_file)
 
-    def get_document(self, docids,topics=[],is_vsm=False):
+    def get_documents(self, docids, topics=[], is_vsm=False):
         res = []
 
         if len(topics) != 0:
@@ -31,7 +31,9 @@ class Access:
                       doc["excerpt"] = doc["text"].split(". ")[0]
                       res.append(doc)
         return res
-
+    def get_doc(self,docid):
+        docs = {doc["docId"]: doc for doc in self.corpus_knn}
+        return docs[docid]
 
 
     def get_doc_ids(self):

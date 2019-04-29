@@ -81,6 +81,22 @@ def api_root():
     resp.headers['Link'] = "http://localhost:3000/"
     return resp
 
+@app.route('/doc',methods = ["POST"])
+def api_doc():
+    data = request.json
+    if request.headers['Content-Type'] == 'application/json':
+        print (json.dumps(data))
+    doc = data["selected_doc"]
+    mode = data["mode"]
+
+    res_data = service.getDoc(doc,mode)
+
+    resp = jsonify(res_data)
+    resp.status_code = 200
+    resp.headers['Link'] = "http://localhost:3000/"
+    return resp
+
+
 
 
 

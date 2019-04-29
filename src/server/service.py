@@ -17,8 +17,11 @@ class Service:
         ca = Access(mode)
         if(type(docid)== set):
             docid = list(docid)
-        return ca.get_document(docid,topic)
+        return ca.get_documents(docid, topic)
 
+    def getDoc(self,docid,mode):
+        ca = Access(mode)
+        return ca.get_doc(docid)
 
     def perfom_boolean_query(self,query,mode,corpus_mode):
         bm = BooleanModel(corpus_mode)
