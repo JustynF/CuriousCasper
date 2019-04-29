@@ -56,6 +56,9 @@ class BM25():
             with open(dirname(dirname(__file__))+'/output/uo_doc_text.json') as doc_text:
                 self.doc_text = json.load(doc_text)
 
+        with open(dirname(dirname(__file__)) + '/output/relevance_feedback.json') as rel_docs:
+            self.rel_docs = json.load(rel_docs)
+
         self.dlt = self.get_dlt()
 
 
@@ -121,18 +124,6 @@ def score_BM25(n, f, qf, r, N, dl, avdl):
 def compute_K(dl, avdl):
     return k1 * ((1 - b) + b * (float(dl) / float(avdl)))
 
-def getRelevantList(queryID, docList):
-    file = open(CACM_REL, "r").read().splitlines()
-    relList = []
-    relDocs = []
-    for line in file:
-        values = line.split()
-        if values[0] == str(queryID):
-            relList.append(values[2])
-    for doc in docList.keys():
-        if doc in relList:
-            relDocs.append(doc)
-    return relDocs
 
 def findRelDocMagnitude(docIndex):
     mag = 0

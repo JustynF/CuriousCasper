@@ -88,8 +88,11 @@ def api_doc():
         print (json.dumps(data))
     doc = data["selected_doc"]
     mode = data["mode"]
+    query = data["query"]
 
-    res_data = service.getDoc(doc,mode)
+    res_data = service.get_doc(doc, mode)
+
+    service.add_relevant_doc(doc,query,mode)
 
     resp = jsonify(res_data)
     resp.status_code = 200

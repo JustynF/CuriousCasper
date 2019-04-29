@@ -19,9 +19,14 @@ class Service:
             docid = list(docid)
         return ca.get_documents(docid, topic)
 
-    def getDoc(self,docid,mode):
+    def get_doc(self, docid, mode):
         ca = Access(mode)
+
         return ca.get_doc(docid)
+
+    def add_relevant_doc(self,docid,query,mode):
+        ca = Access(mode)
+        ca.add_relevant_doc(docid,query)
 
     def perfom_boolean_query(self,query,mode,corpus_mode):
         bm = BooleanModel(corpus_mode)

@@ -1,8 +1,10 @@
 import json
+from collections import defaultdict
 from os.path import dirname
+directory = dirname(dirname(dirname(__file__)))
 class Access:
     def __init__(self,corpus_mode):
-        directory = dirname(dirname(dirname(__file__)))
+
         if corpus_mode =='reuters':
             with open(directory + "/output/reuters_corpus.json", "r") as corpus_file:
                 self.corpus = json.load(corpus_file)
@@ -11,6 +13,8 @@ class Access:
                 self.corpus = json.load(corpus_file)
         with open(directory+"/output/knn_corpus_reuters.json", "r") as corpus_file:
             self.corpus_knn = json.load(corpus_file)
+        with open(directory+"/output/relevance_feedback.json", "r") as relevant_file:
+            self.relevant_docs = json.load(relevant_file)
 
     def get_documents(self, docids, topics=[], is_vsm=False):
         res = []
@@ -34,6 +38,17 @@ class Access:
     def get_doc(self,docid):
         docs = {doc["docId"]: doc for doc in self.corpus_knn}
         return docs[docid]
+
+    def add_relevant_doc(self,docid,query):
+        rel_docs = self.relevant_docs
+
+        if query in rel_docs.keys() and docid in rel_docs[query].keys():
+            rel_docs = rel_docs
+        else:
+            rel_docs[query][docid] = 1
+
+        with open(directory+"/output/relevance_feedback.json", "w") as feedback_file:
+            json.dump(rel_docs,feedback_file,ensure_ascii=False,indent=4)
 
 
     def get_doc_ids(self):
