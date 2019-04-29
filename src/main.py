@@ -76,19 +76,21 @@ def main():
   #
   # print(bm.process_query("occid*",mode))
   #
-  # print("Start processing VSM query...")
-  # start = time.time()
-  # #Create VectorSpaceModel
-  # vsm = VectorSpaceModel(corpus_mode)
-  # res = vsm.process_query("U.S.A", mode)
-  # print (res)
-  # end = time.time()
-  # print("finished processing VSM query " + str(end - start))
+  print("Start processing VSM query...")
+  start = time.time()
+  #Create VectorSpaceModel
+  vsm = VectorSpaceModel(corpus_mode)
+  res = vsm.process_query("canada canola oil", mode)
+  print (res)
+  end = time.time()
+  print("finished processing VSM query " + str(end - start))
 
+  print("Start processing BM25 query...")
+  start = time.time()
   bm25 = BM25(corpus_mode)
-
   print bm25.process_query("occidental", mode)
-
+  end = time.time()
+  print("finished processing BM25 query " + str(end - start))
 
 
 if __name__== "__main__":
