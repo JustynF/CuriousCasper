@@ -57,6 +57,27 @@ def getQuery():
                 if doc["docId"] == pair[0]:
                     doc["score"] = pair[1]
                     returned_docs.append(doc)
+    elif data["search"] == "bm25":
+        doc_ids = service.perfom_bm25_query(query,mode,corpus)
+        topic_list = []
+        for key, value in topics.iteritems():
+            if value:
+                topic_list.append(key)
+        only_ids = []
+
+        doc_ids=doc_ids.items()
+        for pair in doc_ids:
+            only_ids.append(pair[0])
+
+        retreived_docs = service.corpus_access(only_ids,corpus, topic_list)
+
+        returned_docs = []
+
+        for doc in retreived_docs:
+            for pair in doc_ids:
+                if doc["docId"] == pair[0]:
+                    doc["score"] = pair[1]
+                    returned_docs.append(doc)
 
 
 

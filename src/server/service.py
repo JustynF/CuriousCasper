@@ -2,7 +2,7 @@ from src.Modules import booleanretreival
 from src.Modules.Corpus import preprocess
 from src.Modules.booleanretreival import BooleanModel
 from src.Modules.vectorspacemodel import VectorSpaceModel
-from src.Modules.bigrammodel import BigramModel
+from src.Modules.bm25 import BM25
 from src.Modules.Corpus.access import Access
 import json
 from os.path import dirname
@@ -35,6 +35,10 @@ class Service:
     def perfom_vsm_query(self,query,mode,corpus_mode):
         vsm = VectorSpaceModel(corpus_mode)
         return vsm.process_query(query,mode)
+
+    def perfom_bm25_query(self, query, mode, corpus_mode):
+        bm25 = BM25(corpus_mode)
+        return bm25.process_query(query, mode)
 
     def autocomplete(self, query):
         words = query.split(" ")
