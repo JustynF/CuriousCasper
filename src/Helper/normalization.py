@@ -1,11 +1,12 @@
 import nltk
 import re
-import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
 
-def normalize(tokens):
 
-    alphaTokens = [t for t in tokens if re.match("^[a-zA-Z\d]+$",t)]
-    alphaText = nltk.Text(alphaTokens)
+def normalize(tokens,is_bool = False):
+
+
+    if is_bool:
+     alphaTokens = [t for t in tokens if re.match("^[a-zA-Z*\d]+$", t)]
+    else:
+     alphaTokens = [re.sub("\.","",t) for t in tokens if (re.match("^[a-zA-Z\d]+$",t) or t.lower() == 'u.s.a') or t.lower() == 'u.s']
     return alphaTokens

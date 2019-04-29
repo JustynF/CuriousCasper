@@ -10,7 +10,7 @@ class reuterspreprocess():
 
     def __init__(self):
         self.reuters_files = os.path.join(os.getcwd(), "src/reuters")
-        self.document = namedtuple("document","docId title text")
+        self.document = namedtuple("document","docId title text topic")
         self.corpus_list = []
 
     def preprocess(self):
@@ -28,12 +28,16 @@ class reuterspreprocess():
                         if text == "":
                            continue
                         doc_id = filename[:-4]+"-"+str(index)
-                        new_document = self.document(doc_id,title,text)
+
+                        #Adde topic to the document tuple for topic restriction and text categorization with KNN
+                        topic = doc.find('topics').find_all("d")[0].text if doc.find(
+                            'topics').find("d") is not None else ""
+                        new_document = self.document(doc_id,title,text.replace('\n'," "),topic)
 
                         self.corpus_list.append(new_document)
 
         output = [corpus._asdict()
                          for corpus in self.corpus_list]
 
-        with open('src/output/corpus-reuters.json', 'w') as outfile:
+        with open('src/output/reuters_corpus.json', 'w') as outfile:
             json.dump(output, outfile, ensure_ascii=False, indent=4)

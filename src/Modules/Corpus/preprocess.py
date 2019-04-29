@@ -26,7 +26,7 @@ class csiPreprocess():
         output = [list._asdict()
                          for list in self.list]
 
-        with open('src/output/corpus.json', 'wb',) as outfile:
+        with open('src/output/uo_corpus.json', 'wb',) as outfile:
             json.dump(output, outfile, ensure_ascii=False, indent=4)
 
 
