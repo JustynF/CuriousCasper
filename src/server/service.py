@@ -4,8 +4,10 @@ from src.Modules.booleanretreival import BooleanModel
 from src.Modules.vectorspacemodel import VectorSpaceModel
 from src.Modules.bm25 import BM25
 from src.Modules.Corpus.access import Access
+from src.Modules.soundex import soundex
 import json
 from os.path import dirname
+from nltk import word_tokenize
 
 directory = dirname(dirname(__file__))
 
@@ -39,6 +41,17 @@ class Service:
     def perfom_bm25_query(self, query, mode, corpus_mode):
         bm25 = BM25(corpus_mode)
         return bm25.process_query(query, mode)
+
+    def perform_soundex(self,query):
+
+        with open(directory = "/output/soundex.json") as soundex:
+            suggestions = json.load(soundex)
+
+        query_tokens = word_tokenize(query)
+
+
+
+
 
     def autocomplete(self, query):
         words = query.split(" ")
