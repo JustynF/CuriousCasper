@@ -33,12 +33,15 @@ class BooleanModel:
                 self.inverted_index = json.load(inv_index)
 
 
+
+
         self.operators = ["AND","OR","NOT"]
         self.query_operators = []
         self.queries = []
         self.mode = "default"
 
     def process_query(self,query,mode):
+        user_query = query
         query = [word for word in word_tokenize(query) if word not in string.punctuation]
         if (mode == "normalize"):
             query_tokens =  normalize(query,True)
@@ -67,13 +70,13 @@ class BooleanModel:
             if token.upper() in self.operators:
                 self.query_operators.append(token)
             else:
-                    if "*" in token:
-                        set_of_words = self.find_wildcard(token,self.handle_wildcard(token))
-                        wildcard_query = " OR ".join(set_of_words)
-                        postfix_queue = self.create_postfix_queue(wildcard_query)
-                    else:
-                        if token in dict:
-                            self.queries.append(self.inverted_index[token])
+                if "*" in token:
+                    set_of_words = self.find_wildcard(token, self.handle_wildcard(token))
+                    wildcard_query = " OR ".join(set_of_words)
+                    postfix_queue = self.create_postfix_queue(wildcard_query)
+                else:
+                    if token in dict:
+                        self.queries.append(self.inverted_index[token])
 
         for operation in self.query_operators:
             if operation.upper() == 'AND':

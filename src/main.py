@@ -8,6 +8,8 @@ from src.Modules.Corpus.preprocess import csiPreprocess
 from src.Modules.Corpus.reuterspreprocess import reuterspreprocess
 from src.Modules.textcategorization import textCategorization
 from src.Modules.bm25 import BM25
+from src.Modules.phraseindex import phraseindex
+from src.Modules.soundex import soundex
 
 import time
 
@@ -31,7 +33,7 @@ def main():
   # end = time.time()
   # print "Finished creating dictionary " +str(end-start) + "\n"
   #
-  # #create inverted index
+  #create inverted index
   # start2 = time.time()
   # print "Creating Inverted Index..."
   # index = Index()
@@ -39,8 +41,17 @@ def main():
   #
   # end2 = time.time()
   # print "Finished creating Inverted Index " + str(end2 - start2) + "\n"
+  #
+  start2 = time.time()
+  print "Creating Phrase Index..."
+
+  s = soundex()
+  s.createSoundexIndex()
+  end2 = time.time()
+  print "Finished creating Phrase Index " + str(end2 - start2) + "\n"
 
   # print "Creating thesaurus..."
+  # # print "Creating thesaurus..."
   # start3 = time.time()
   # #create thesaurus
   # t = thesaurus()
@@ -71,11 +82,11 @@ def main():
   #
   # print ("Finished Text Categorization ",str(end-start))
   #
-  # #create BooleanModel
-  # bm = BooleanModel(corpus_mode)
-  #
-  # print(bm.process_query("occid*",mode))
-  #
+  #create BooleanModel
+  bm = BooleanModel(corpus_mode)
+
+  print(bm.process_query("prob*",mode))
+
   print("Start processing VSM query...")
   start = time.time()
   #Create VectorSpaceModel

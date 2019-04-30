@@ -13,14 +13,14 @@ class Service:
     def __init__(self):
         print "Service Started"
 
-    def corpus_access(self,docid,mode,topic=[]):
-        ca = Access(mode)
+    def corpus_access(self, docid, corpus, topic=[]):
+        ca = Access(corpus)
         if(type(docid)== set):
             docid = list(docid)
         return ca.get_documents(docid, topic)
 
-    def get_doc(self, docid, mode):
-        ca = Access(mode)
+    def get_doc(self, docid, corpus):
+        ca = Access(corpus)
 
         return ca.get_doc(docid)
 

@@ -45,39 +45,36 @@ def getQuery():
             if value:
                 topic_list.append(key)
         only_ids = []
+        docs_score = {}
         for pair in doc_ids:
-            only_ids.append(pair[0])
+            docs_score[pair[0]] = pair[1]
 
-        retreived_docs = service.corpus_access(only_ids,corpus, topic_list)
+
+        retreived_docs = service.corpus_access(docs_score.keys(),corpus, topic_list)
 
         returned_docs = []
 
         for doc in retreived_docs:
-            for pair in doc_ids:
-                if doc["docId"] == pair[0]:
-                    doc["score"] = pair[1]
-                    returned_docs.append(doc)
+            doc["score"] = docs_score[doc["docId"]]
+            returned_docs.append(doc)
+
+
+
+
     elif data["search"] == "bm25":
         doc_ids = service.perfom_bm25_query(query,mode,corpus)
         topic_list = []
         for key, value in topics.iteritems():
             if value:
                 topic_list.append(key)
-        only_ids = []
 
-        doc_ids=doc_ids.items()
-        for pair in doc_ids:
-            only_ids.append(pair[0])
-
-        retreived_docs = service.corpus_access(only_ids,corpus, topic_list)
+        retreived_docs = service.corpus_access(doc_ids.keys(),corpus, topic_list)
 
         returned_docs = []
-
         for doc in retreived_docs:
-            for pair in doc_ids:
-                if doc["docId"] == pair[0]:
-                    doc["score"] = pair[1]
-                    returned_docs.append(doc)
+            doc_id = str(doc["docId"]).decode("utf-8") if corpus == "uo" else doc["docId"]
+            doc["score"] = doc_ids[doc_id]
+            returned_docs.append(doc)
 
 
 
@@ -108,12 +105,12 @@ def api_doc():
     if request.headers['Content-Type'] == 'application/json':
         print (json.dumps(data))
     doc = data["selected_doc"]
-    mode = data["mode"]
     query = data["query"]
+    corpus = data["corpus"]
 
-    res_data = service.get_doc(doc, mode)
+    res_data = service.get_doc(doc, corpus)
 
-    service.add_relevant_doc(doc,query,mode)
+    service.add_relevant_doc(doc,query,corpus)
 
     resp = jsonify(res_data)
     resp.status_code = 200
