@@ -17,7 +17,7 @@ class BooleanModel:
                 docs = json.load(corpus)
             self.all_doc_id = {document['docId'] for document in docs}
 
-            with open(directory+"/output/reuters_dictionary.json") as dictionary:
+            with open(directory+"/output/new_reuters_dict.json") as dictionary:
                 self.dict = json.load(dictionary)
             with open(directory+"/output/reuters_invertedindex.json") as inv_index:
                 self.inverted_index = json.load(inv_index)
@@ -26,7 +26,7 @@ class BooleanModel:
                 docs = json.load(corpus)
             self.all_doc_id = {document['docId'] for document in docs}
 
-            with open(directory+"/output/uo_dictionary.json") as dictionary:
+            with open(directory+"/output/new_uo_dic.json") as dictionary:
                 self.dict = json.load(dictionary)
 
             with open(directory+"/output/uo_invertedindex.json") as inv_index:

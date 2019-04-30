@@ -26,7 +26,7 @@ def main():
   # end0 = time.time()
   # print "Finished creating Reuters corpus "+ str(end0-start0) + "\n"
   #
-  # #Crete dictionary
+  #Crete dictionary
   # start = time.time()
   # print "Creating Dictionary..."
   # dict = Dictionary(mode)
@@ -34,12 +34,12 @@ def main():
   # print "Finished creating dictionary " +str(end-start) + "\n"
   #
   #create inverted index
-  # start2 = time.time()
-  # print "Creating Inverted Index..."
-  # index = Index()
-  # index.create_index()
-  #
-  # end2 = time.time()
+  start2 = time.time()
+  print "Creating Inverted Index..."
+  index = Index()
+  index.create_index()
+
+  end2 = time.time()
   # print "Finished creating Inverted Index " + str(end2 - start2) + "\n"
   #
   start2 = time.time()

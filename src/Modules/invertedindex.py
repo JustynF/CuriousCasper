@@ -14,14 +14,14 @@ class Index:
         self.reuters_documents = {}
 
 
-        with open("src/output/uo_doc_text.json",'rb') as doc_text:
+        with open("src/output/normalized/uo_doc_text.json",'rb') as doc_text:
             self.uo_doc_corpus = json.load(doc_text)
         with open("src/output/new_uo_dict.json") as corpus_file:
             self.uo_dict = json.load(corpus_file)
 
-        with open("src/output/reuters_doc_text.json",'rb') as doc_text:
+        with open("src/output/normalized/reuters_doc_text.json",'rb') as doc_text:
             self.reuters_corpus = json.load(doc_text)
-        with open("src/output/new_reuters_dict.json") as corpus_file:
+        with open("src/output/normalized/new_reuters_dict.json") as corpus_file:
             self.reuters_dict = json.load(corpus_file)
 
         self.uo_doc_freq = {}
@@ -56,8 +56,8 @@ class Index:
                     self.reuters_doc_freq[token] = {}
                 self.reuters_doc_freq[token][id] = text.count(token)
 
-        with open('src/output/test_uo_tf.json', 'w', ) as outfile:
+        with open('src/output/normalized/test_uo_tf.json', 'w', ) as outfile:
             json.dump(self.uo_doc_freq, outfile, ensure_ascii=False, indent=4)
 
-        with open('src/output/test_reuters_tf.json', 'w', ) as outfile:
+        with open('src/output/normalized/test_reuters_tf.json', 'w', ) as outfile:
             json.dump(self.reuters_doc_freq, outfile, ensure_ascii=False, indent=4)

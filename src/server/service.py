@@ -7,13 +7,23 @@ from src.Modules.Corpus.access import Access
 from src.Modules.soundex import soundex
 import json
 from os.path import dirname
-from nltk import word_tokenize
-
+from nltk import edit_distance
 directory = dirname(dirname(__file__))
 
 class Service:
     def __init__(self):
         print "Service Started"
+        with open( directory+"/output/soundex.json") as soundex:
+            self.suggestions = json.load(soundex)
+
+        with open(directory+"/output/new_reuters_dict.json") as reuters_dict:
+            self.reuters_dict = json.load(reuters_dict)
+
+        with open(directory+"/output/new_uo_dict.json") as uo_dict:
+            self.uo_dict = json.load(uo_dict)
+
+        with open(directory+"/output/new_uo_dict.json") as uo_dict:
+            self.uo_dict = json.load(uo_dict)
 
     def corpus_access(self, docid, corpus, topic=[]):
         ca = Access(corpus)
@@ -42,14 +52,43 @@ class Service:
         bm25 = BM25(corpus_mode)
         return bm25.process_query(query, mode)
 
-    def perform_soundex(self,query):
+    def perform_soundex(self,query,corpus_mode):
+        suggestions = self.suggestions
 
-        with open(directory = "/output/soundex.json") as soundex:
-            suggestions = json.load(soundex)
+        if corpus_mode == "reuters":
+            dictionary = self.reuters_dict
+        else:
+            dictionary = self.uo_dict
 
-        query_tokens = word_tokenize(query)
+        s = soundex(corpus_mode)
+        query_tokens = s.preprocess_query(query)
+        res = []
+        for word_token in query_tokens:
+            if word_token not in dictionary:
+                query_soundex = s.get_soundex(word_token)
+
+                if query_soundex in suggestions:
+                    query_suggestion = max(suggestions[query_soundex], key=lambda key: suggestions[query_soundex][key])
+                    res.append(query_suggestion)
+            else:
+                res.append(word_token)
+
+        corrected_query = " ".join(res)
+        return corrected_query
 
 
+
+
+
+
+
+
+    def editdistance(self,query,corpus_mode):
+        s = soundex(corpus_mode)
+        query_tokens = s.preprocess_query(query)
+
+        for word in query_tokens:
+            if word_token not in dictionary:
 
 
 

@@ -117,6 +117,21 @@ def api_doc():
     resp.headers['Link'] = "http://localhost:3000/"
     return resp
 
+@app.route('/soundex',methods = ["POST"])
+def api_soundex():
+    data = request.json
+    if request.headers['Content-Type'] == 'application/json':
+        print (json.dumps(data))
+    query = data["query"]
+    corpus = data["corpus"]
+
+    res = service.perform_soundex(query,corpus)
+
+    resp = jsonify(res)
+    resp.status_code = 200
+    resp.headers['Link'] = "http://localhost:3000/"
+    return resp
+
 
 
 

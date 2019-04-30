@@ -1,19 +1,15 @@
 import  nltk
 from nltk import word_tokenize
-from nltk.stem import *
-from nltk.stem.porter import *
+
 import json
-from collections import namedtuple
-from src.Helper.rake import Rake
-from rake_nltk import Rake as nltk_rake
-from src.Helper.normalization import normalize as normalizer
-from src.Helper.stemmer import stemmer as stemmer
-from src.Helper.stopwords import remove_stopword as stopwords
-from nltk.corpus import stopwords as set_stopwords
+
 import string
 from os.path import dirname
 import fuzzy
 from collections import defaultdict
+from src.Helper.stemmer import stemmer
+from src.Helper.stopwords import remove_stopword
+from src.Helper.normalization import normalize
 
 dirpath = dirname(dirname(__file__))
 
@@ -45,8 +41,42 @@ class soundex:
 
             res[word_soundex][word] = sum(docs.values())
 
+        for word in self.dict_uo:
+            word = word.decode("utf-8")
+            word_soundex = soundex(word)
+            docs = self.uo_tf[word]
+            if word_soundex not in res:
+                res[word_soundex] = {}
 
-        with open(dirpath+"/output/soundex.json","wb") as phrase_index:
+            res[word_soundex][word] = sum(docs.values())
+
+
+        with open(dirpath+"/output/soundex.json","w") as phrase_index:
             json.dump(res,phrase_index,ensure_ascii=False,indent=4)
         return res
 
+    def get_soundex(self,word):
+        soundex = fuzzy.Soundex(4)
+        return soundex(word)
+
+
+    def preprocess_query(self,query):
+        mode = self.mode
+        query = [word for word in word_tokenize(query) if word not in string.punctuation]
+        if (mode == "normalize"):
+            query_tokens = normalize(query, True)
+            query = " ".join(query_tokens)
+        elif mode == "stopwords":
+            query_tokens = remove_stopword(query, True)
+            query = " ".join(query_tokens)
+        elif mode == "stemmer":
+            query_tokens = stemmer(query)
+            query = " ".join(query_tokens)
+        elif mode == "clean":
+            query_tokens = normalize(stemmer(remove_stopword(query, True)), True)
+            query = " ".join(query_tokens)
+        else:
+            query_tokens = normalize(query, True)
+            query = " ".join(query_tokens)
+
+        return query_tokens
