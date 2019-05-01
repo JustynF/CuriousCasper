@@ -5,9 +5,9 @@ from src.Modules.vectorspacemodel import VectorSpaceModel
 from src.Modules.bm25 import BM25
 from src.Modules.Corpus.access import Access
 from src.Modules.soundex import soundex
+from src.Modules.editdistance import editdistance
 import json
 from os.path import dirname
-from nltk import edit_distance
 directory = dirname(dirname(__file__))
 
 class Service:
@@ -16,14 +16,12 @@ class Service:
         with open( directory+"/output/soundex.json") as soundex:
             self.suggestions = json.load(soundex)
 
-        with open(directory+"/output/new_reuters_dict.json") as reuters_dict:
+        with open(directory+"/output/normalized/new_reuters_dict.json") as reuters_dict:
             self.reuters_dict = json.load(reuters_dict)
 
-        with open(directory+"/output/new_uo_dict.json") as uo_dict:
+        with open(directory+"/output/normalized/new_uo_dict.json") as uo_dict:
             self.uo_dict = json.load(uo_dict)
 
-        with open(directory+"/output/new_uo_dict.json") as uo_dict:
-            self.uo_dict = json.load(uo_dict)
 
     def corpus_access(self, docid, corpus, topic=[]):
         ca = Access(corpus)
@@ -84,11 +82,26 @@ class Service:
 
 
     def editdistance(self,query,corpus_mode):
-        s = soundex(corpus_mode)
-        query_tokens = s.preprocess_query(query)
+        e = editdistance()
+
+        query_tokens = e.preprocess_query(query)
+        res = []
+        if corpus_mode == "reuters":
+            dictionary = self.reuters_dict
+        else:
+            dictionary = self.uo_dict
 
         for word in query_tokens:
-            if word_token not in dictionary:
+            if word not in dictionary:
+                suggestions = e.get_edit_distance(word,corpus_mode)
+                top_word = min(suggestions, key = lambda key:suggestions[key])
+                res.append(top_word)
+            else:
+                res.append(word)
+
+        corrected_query = " ".join(res)
+        return corrected_query
+
 
 
 

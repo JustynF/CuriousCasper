@@ -132,7 +132,20 @@ def api_soundex():
     resp.headers['Link'] = "http://localhost:3000/"
     return resp
 
+@app.route('/edit',methods = ["POST"])
+def api_edit():
+    data = request.json
+    if request.headers['Content-Type'] == 'application/json':
+        print (json.dumps(data))
+    query = data["query"]
+    corpus = data["corpus"]
 
+    res = service.editdistance(query,corpus)
+
+    resp = jsonify(res)
+    resp.status_code = 200
+    resp.headers['Link'] = "http://localhost:3000/"
+    return resp
 
 
 
