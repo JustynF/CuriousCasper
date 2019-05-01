@@ -51,7 +51,7 @@ class soundex:
             res[word_soundex][word] = sum(docs.values())
 
 
-        with open(dirpath+"/output/soundex.json","w") as phrase_index:
+        with open(dirpath+"/output/normalized/soundex.json","w") as phrase_index:
             json.dump(res,phrase_index,ensure_ascii=False,indent=4)
         return res
 

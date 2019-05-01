@@ -3,6 +3,8 @@ from collections import defaultdict
 import json
 import re
 
+from os.path import dirname
+directory = dirname(dirname(__file__))
 
 class Index:
     def __init__(self):
@@ -14,14 +16,14 @@ class Index:
         self.reuters_documents = {}
 
 
-        with open("src/output/normalized/uo_doc_text.json",'rb') as doc_text:
+        with open(directory+"/output/normalized/uo_doc_text.json",'rb') as doc_text:
             self.uo_doc_corpus = json.load(doc_text)
-        with open("src/output/new_uo_dict.json") as corpus_file:
+        with open(directory+"/output/normalized/new_uo_dict.json") as corpus_file:
             self.uo_dict = json.load(corpus_file)
 
-        with open("src/output/normalized/reuters_doc_text.json",'rb') as doc_text:
+        with open(directory+"/output/normalized/reuters_doc_text.json",'rb') as doc_text:
             self.reuters_corpus = json.load(doc_text)
-        with open("src/output/normalized/new_reuters_dict.json") as corpus_file:
+        with open(directory+"/output/normalized/new_reuters_dict.json") as corpus_file:
             self.reuters_dict = json.load(corpus_file)
 
         self.uo_doc_freq = {}
@@ -35,29 +37,31 @@ class Index:
 
     def term_frequency(self):
         print(" getting uo_term_frequency")
+        uo_tf= defaultdict()
+        reuters_tf = defaultdict()
+        for word in self.uo_dict:
+            uo_tf[word] = {}
         for doc_id,text in self.uo_doc_corpus.iteritems():
-            for token in self.uo_dict :
-                token = token.encode("utf-8")
-                id = doc_id.encode("utf-8")
+            print doc_id
+            for word in text:
+                if doc_id not in uo_tf[word].keys():
+                    uo_tf[word][doc_id] = 0
+                uo_tf[word][doc_id] +=1
 
-                if token not in self.uo_doc_freq.keys():
-                    self.uo_doc_freq[token] = {}
-                self.uo_doc_freq[token][id] = text.count(token)
+        with open(directory+'/output/normalized/test_uo_tf.json', 'w', ) as outfile:
+            json.dump(uo_tf, outfile, ensure_ascii=False, indent=4)
 
         print(" getting reuters_term_frequency")
 
+        for word in self.reuters_dict:
+            reuters_tf[word] = {}
         for doc_id, text in self.reuters_corpus.iteritems():
-            for token in self.reuters_dict:
-                token = token.encode("utf-8")
-                id = doc_id.encode("utf-8")
+            print doc_id
+            for word  in text:
+                if doc_id not in reuters_tf[word].keys():
+                    reuters_tf[word][doc_id] = 0
+                reuters_tf[word][doc_id]+=1
 
-                #Check if the token already has document if not initialze empty dict
-                if token not in self.reuters_doc_freq.keys():
-                    self.reuters_doc_freq[token] = {}
-                self.reuters_doc_freq[token][id] = text.count(token)
 
-        with open('src/output/normalized/test_uo_tf.json', 'w', ) as outfile:
-            json.dump(self.uo_doc_freq, outfile, ensure_ascii=False, indent=4)
-
-        with open('src/output/normalized/test_reuters_tf.json', 'w', ) as outfile:
-            json.dump(self.reuters_doc_freq, outfile, ensure_ascii=False, indent=4)
+        with open(directory+'output/normalized/test_reuters_tf.json', 'w', ) as outfile:
+            json.dump(reuters_tf, outfile, ensure_ascii=False, indent=4)
