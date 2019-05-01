@@ -40,7 +40,7 @@ def main():
   index.create_index()
 
   end2 = time.time()
-  # print "Finished creating Inverted Index " + str(end2 - start2) + "\n"
+  print "Finished creating Inverted Index " + str(end2 - start2) + "\n"
   #
   start2 = time.time()
   print "Creating Phrase Index..."
