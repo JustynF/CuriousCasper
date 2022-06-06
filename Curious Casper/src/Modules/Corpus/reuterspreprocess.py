@@ -1,3 +1,4 @@
+
 import os
 from bs4 import BeautifulSoup
 import json
@@ -9,14 +10,14 @@ import requests
 class reuterspreprocess():
 
     def __init__(self):
-        self.reuters_files = os.path.join(os.getcwd(), "src/reuters")
+        self.reuters_files = os.path.join(os.getcwd(), "reuters")
         self.document = namedtuple("document","docId title text topic")
         self.corpus_list = []
 
     def preprocess(self):
         for filename in os.listdir(self.reuters_files):
             if not filename.startswith('.'):
-                with open(os.path.join(self.reuters_files, filename), 'r') as file:
+                with open(os.path.join(self.reuters_files, filename), 'r',encoding='ISO-8859-1') as file:
 
                     data = file.read()
                     soup = BeautifulSoup(data, "html.parser")
@@ -39,5 +40,5 @@ class reuterspreprocess():
         output = [corpus._asdict()
                          for corpus in self.corpus_list]
 
-        with open('src/output/reuters_corpus.json', 'w') as outfile:
+        with open('output/reuters_corpus.json', 'w') as outfile:
             json.dump(output, outfile, ensure_ascii=False, indent=4)

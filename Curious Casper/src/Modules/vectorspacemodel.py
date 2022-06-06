@@ -2,9 +2,9 @@ import json
 import math
 from nltk.tokenize import word_tokenize
 from collections import defaultdict
-from src.Helper.stemmer import stemmer
-from src.Helper.stopwords import remove_stopword
-from src.Helper.normalization import normalize
+from Helper.stemmer import stemmer
+from Helper.stopwords import remove_stopword
+from Helper.normalization import normalize
 import operator
 from os.path import dirname
 import string
@@ -99,7 +99,7 @@ class VectorSpaceModel():
 
     def get_idf(self):
         inv_index = self.inv_index_freq
-        res = {word[0]: math.log10(len(self.all_doc_id)/len(word[1])) for word in inv_index.iteritems()}
+        res = {word[0]: math.log10(len(self.all_doc_id)/len(word[1])) for word in inv_index.items()}
         return res
 
 
@@ -108,7 +108,7 @@ def get_tf_idf( idf_index, term_freq):
     tf_idf = defaultdict(lambda: defaultdict(int))
 
     for word in term_freq.items():
-        for doc in word[1].iteritems():
+        for doc in word[1].items():
             tf_idf[word[0]][doc[0]] = idf_index[word[0]] * doc[1]
     return tf_idf
 
@@ -121,7 +121,7 @@ def get_doc_vectors(all_doc_id, tf_idf_matrix, tokens):
         vector = []
         for token in tokens:
             doc_weights = tf_idf_matrix[token]
-            weight = doc_weights[str(doc_id).decode("utf-8")]
+            weight = doc_weights[str(doc_id)]
             vector.append(weight)
         doc_vec[doc_id] = vector
 

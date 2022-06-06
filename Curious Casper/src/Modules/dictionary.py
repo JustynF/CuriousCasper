@@ -4,16 +4,16 @@ from nltk.stem import *
 from nltk.stem.porter import *
 import json
 from collections import namedtuple
-from src.Helper.normalization import normalize as normalizer
-from src.Helper.stemmer import stemmer as stemmer
-from src.Helper.stopwords import remove_stopword as stopwords
+from Helper.normalization import normalize as normalizer
+from Helper.stemmer import stemmer as stemmer
+from Helper.stopwords import remove_stopword as stopwords
 
 
 class Dictionary:
     def __init__(self,mode = "default"):
-        with open("src/output/uo_corpus.json") as corpus_file:
+        with open("output/uo_corpus.json") as corpus_file:
             self.data_uo = json.load(corpus_file)
-        with open("src/output/reuters_corpus.json") as reuters_file:
+        with open("output/reuters_corpus.json") as reuters_file:
             self.data_reuters = json.load(reuters_file)
         self.mode = mode
 
@@ -58,14 +58,14 @@ class Dictionary:
             self.uo_removed_stopwords = stopwords(self.uo_normalized_words)
             self.reuters_removed_stopwords = stopwords(self.reuters_normalized_words)
 
-            uo_words.update([word.encode("UTF-8") for word in self.uo_removed_stopwords])
-            reuters_words.update([word.encode("UTF-8") for word in self.reuters_removed_stopwords])
+            uo_words.update([word for word in self.uo_removed_stopwords])
+            reuters_words.update([word for word in self.reuters_removed_stopwords])
         elif self.mode == "stemmer":
             self.uo_stemmed_words = stemmer(self.uo_normalized_words)
             self.reuters_stemmed_words = stemmer(self.reuters_normalized_words)
 
-            uo_words.update([word.encode("UTF-8") for word in self.uo_stemmed_words])
-            reuters_words.update([word.encode("UTF-8") for word in self.reuters_stemmed_words])
+            uo_words.update([word for word in self.uo_stemmed_words])
+            reuters_words.update([word for word in self.reuters_stemmed_words])
 
         elif self.mode == "clean":
             self.uo_clean_words = stemmer(stopwords(self.uo_normalized_words))
@@ -98,38 +98,39 @@ class Dictionary:
         res = {}
         output = {}
         dict_set = set()
-        for doc in self.data_uo:
-            text_token = doc["text"].lower()
+        data_uo = json.loads(self.data_uo)
+        for doc in data_uo:
+            text_token = doc["description"].lower()
             title_token = doc["title"].lower()
             dict = title_token + " " + text_token
 
-            res[doc["docId"]] = word_tokenize(dict.encode("UTF-8"))
+            res[doc["docId"]] = word_tokenize(dict)
 
             if self.mode == "normalize":
-                out = normalizer(word_tokenize(dict.encode("UTF-8")))
+                out = normalizer(word_tokenize(dict))
                 dict_set.update(out)
-                output[doc["docId"]] = normalizer(word_tokenize(dict.encode("UTF-8")))
+                output[doc["docId"]] = normalizer(word_tokenize(dict))
             elif self.mode == "stopwords":
-                out = normalizer(stopwords(normalizer(word_tokenize(dict.encode("UTF-8")))))
+                out = normalizer(stopwords(normalizer(word_tokenize(dict))))
                 dict_set.update(out)
                 output[doc["docId"]] = out
             elif self.mode == "stemmer":
-                out = normalizer(stemmer(word_tokenize(dict.encode("UTF-8"))))
+                out = normalizer(stemmer(word_tokenize(dict)))
                 dict_set.update(out)
                 output[doc["docId"]] = out
             elif self.mode == "clean":
-                out = normalizer(stemmer(stopwords(normalizer(word_tokenize(dict.encode("UTF-8"))))))
+                out = normalizer(stemmer(stopwords(normalizer(word_tokenize(dict)))))
                 dict_set.update(out)
                 output[doc["docId"]] = out
             else:
-                out = normalizer(word_tokenize(dict.encode("UTF-8")))
+                out = normalizer(word_tokenize(dict))
                 dict_set.update(out)
                 output[doc["docId"]] = out
 
-        with open("src/output/new_uo_dict.json", 'wb') as outfile:
+        with open("output/new_uo_dict.json", 'w') as outfile:
             json.dump(list(dict_set), outfile, ensure_ascii=False, indent=4)
 
-        with open("src/output/uo_doc_text.json", 'wb') as outfile:
+        with open("output/uo_doc_text.json", 'w') as outfile:
             json.dump(output, outfile, ensure_ascii=False, indent=4)
         print(" finished getting uo_doc_text")
         return res
@@ -154,33 +155,33 @@ class Dictionary:
 
             dict = title_token + " " + text_token
 
-            tokenized = word_tokenize(dict.encode("UTF-8"))
-            res[doc["docId"]] = tokenized
+            tokenized_dict = word_tokenize(dict)
+            res[doc["docId"]] = tokenized_dict
             if self.mode == "normalize":
-                out = normalizer(word_tokenize(dict.encode("UTF-8")))
+                out = normalizer(tokenized_dict)
                 dict_set.update(out)
                 output[doc["docId"]] = out
             elif self.mode == "stopwords":
-                out = normalizer(stopwords(word_tokenize(dict.encode("UTF-8"))))
+                out = stopwords(normalizer(tokenized_dict))
                 dict_set.update(out)
                 output[doc["docId"]] = out
             elif self.mode == "stemmer":
-                out = normalizer(stemmer(word_tokenize(dict.encode("UTF-8"))))
+                out = stemmer(normalizer(tokenized_dict))
                 dict_set.update(out)
                 output[doc["docId"]] = out
             elif self.mode == "clean":
-                out = normalizer(stemmer(stopwords(word_tokenize(dict.encode("UTF-8")))))
+                out = stemmer(stopwords(normalizer(tokenized_dict)))
                 dict_set.update(out)
                 output[doc["docId"]] = out
             else:
-                out = normalizer(word_tokenize(dict.encode("UTF-8")))
+                out = normalizer(word_tokenize(dict))
                 dict_set.update(out)
                 output[doc["docId"]] = out
 
-        with open("src/output/new_reuters_dict.json", 'wb') as outfile:
+        with open("output/new_reuters_dict.json", 'w') as outfile:
             json.dump(list(dict_set), outfile, ensure_ascii=False, indent=4)
 
-        with open("src/output/reuters_doc_text.json", 'wb') as outfile:
+        with open("output/reuters_doc_text.json", 'w') as outfile:
             json.dump(output, outfile, ensure_ascii=False, indent=4)
         print(" finished getting reuters_doc_text")
         return res

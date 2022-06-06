@@ -7,7 +7,7 @@ class csiPreprocess():
     def __init__(self):
         self.url = "https://catalogue.uottawa.ca/en/courses/csi/"
         self.document = namedtuple("document","docId title text")
-        self.list = []
+        self.courses = []
 
     def preprocess(self):
 
@@ -18,16 +18,25 @@ class csiPreprocess():
             title = courseblock.find('p', attrs={'class': 'courseblocktitle'})
             desc = courseblock.find('p', attrs={'class': 'courseblockdesc'})
             if desc is not None:
-                new_document = self.document(i, title.text.encode('utf-8'), desc.text.encode('utf-8').strip())
+                new_document = {
+                    "docId":i,
+                    "title":title.text,
+                    "text":desc.text.strip()
+                }
+                #new_document = self.document(i, title.text, desc.text.strip())
             else:
-                new_document = self.document(i, title.text.encode('utf-8'), '')
-            self.list.append(new_document)
+                new_document = {
+                    "docId": i,
+                    "title": title.text,
+                    "text": "desc n/a"
+                }
+            self.courses.append(new_document)
 
-        output = [list._asdict()
-                         for list in self.list]
 
-        with open('src/output/uo_corpus.json', 'wb',) as outfile:
-            json.dump(output, outfile, ensure_ascii=False, indent=4)
+        output = json.dumps(self.courses)
+
+        with open('output/uo_corpus.json', 'w',) as outfile:
+            json.dump(output, outfile)
 
 
 

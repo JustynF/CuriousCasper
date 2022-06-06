@@ -7,13 +7,10 @@ import time
 
 class thesaurus():
     def __init__(self):
-        with open('src/output/reuters_invertedindex.json') as inverted_index:
-            self.inverted_index = json.load(inverted_index)
-
-        with open('src/output/reuters_doc_text.json') as corpus:
+        with open('output/reuters_doc_text.json') as corpus:
             self.reuters_corpus = json.load(corpus)
 
-        with open('src/output/reuters_tf.json') as reuters_tf:
+        with open('output/reuters_tf.json') as reuters_tf:
             self.reuters_tf = json.load(reuters_tf)
 
     def build_thesaurus(self):
@@ -26,7 +23,7 @@ class thesaurus():
             total = 0
             for doc_id in docs:
                 #get term frequency for each word in document
-                doc_id = doc_id.encode("utf-8")
+                doc_id = doc_id
                 total += self.reuters_tf[word][doc_id]
             total_term_frequency[word] = total
 
@@ -38,8 +35,8 @@ class thesaurus():
         #ouput's an array of the top 1000 word tuples for each word and total frequency
         popular_words = [(word[0], word[1]) for word in sorted_dict][:1000]
 
-        # words in corpus are not stemmed or normalized try using reuters_doc_text built from from corpus
-        for doc,text in self.reuters_corpus.iteritems():
+        # words in corpus are not stemmed or normalized try using reuters_doc_text built  from corpus
+        for doc,text in self.reuters_corpus.items():
             doc_id = doc
             text = text
             #find's the word count for each word in popular words for each document
@@ -52,30 +49,30 @@ class thesaurus():
         #list of all the popular words
         popular_terms = [words[0] for words in popular_words]
 
-        with open('src/output/thesaurus_tf.json', 'w') as outfile:
+        with open('output/thesaurus_tf.json', 'w') as outfile:
             json.dump(terms, outfile,
                       ensure_ascii=False, indent=4)
 
-        with open('src/output/thesaurus_words.json', 'w') as outfile:
+        with open('output/thesaurus_words.json', 'w') as outfile:
             json.dump(popular_terms, outfile, ensure_ascii=False, indent=4)
 
     #https: // python.gotrained.com / nltk - edit - distance - jaccard - distance /
     def calculate_similarity_scores(self):
-        with open('src/output/thesaurus_tf.json') as term_freqs:
+        with open('output/thesaurus_tf.json') as term_freqs:
             thesaurus_tf = json.load(term_freqs)
 
-        with open('src/output/thesaurus_words.json') as thesaurus_words:
+        with open('output/thesaurus_words.json') as thesaurus_words:
             terms = json.load(thesaurus_words)
 
         new_thesaurus = defaultdict(lambda: defaultdict(lambda: 0))
 
         for i, w1 in enumerate(terms[:len(terms)-1]):
             for _,w2 in enumerate(terms[i+1:]):
-                for doc_id,doc_terms in thesaurus_tf.iteritems():
+                for doc_id,doc_terms in thesaurus_tf.items():
                     if w1 in doc_terms and w2 in doc_terms:
                         new_thesaurus[w1][w2] = jaccard(w1,w2)
 
-        with open('src/output/thesaurus.json', 'w') as thesaurus:
+        with open('output/thesaurus.json', 'w') as thesaurus:
             json.dump(new_thesaurus, thesaurus,
                       ensure_ascii=False, indent=4)
 

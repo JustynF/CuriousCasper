@@ -1,11 +1,13 @@
+import importlib
+
 import  nltk
 from nltk import word_tokenize
 from nltk.stem import *
 from nltk.stem.porter import *
 import re
 import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
+importlib.reload(sys)
+#sys.setdefaultencoding('utf-8')
 
 
 def stemmer(tokens,is_bool = False):

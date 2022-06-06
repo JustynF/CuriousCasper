@@ -31,6 +31,7 @@ class Access:
                       doc["excerpt"] = doc["text"].split(". ")[0]
                       res.append(doc)
         return res
+
     def get_doc(self,docid):
         docs = {doc["docId"]: doc for doc in self.corpus_knn}
         return docs[docid]

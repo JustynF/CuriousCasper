@@ -1,8 +1,8 @@
 import  json
 from nltk.tokenize import word_tokenize
-from src.Helper.stemmer import stemmer
-from src.Helper.stopwords import remove_stopword
-from src.Helper.normalization import normalize
+from Helper.stemmer import stemmer
+from Helper.stopwords import remove_stopword
+from Helper.normalization import normalize
 from os.path import dirname
 import string
 from math import log, sqrt
@@ -32,7 +32,7 @@ class DocumentLengthTable:
 
     def get_average_length(self):
         sum = 0
-        for length in self.table.itervalues():
+        for length in self.table.values():
             sum += length
         return float(sum) / float(len(self.table))
 
@@ -81,7 +81,7 @@ class BM25():
         for term in tokens:
             if term in self.inv_index_freq:
                 doc_dict = self.inv_index_freq[term]  # retrieve index entry
-                for docid, freq in doc_dict.iteritems():  # for each document and its word frequency
+                for docid, freq in doc_dict.items():  # for each document and its word frequency
                     score = score_BM25(n=len(doc_dict), f=freq, qf=1, r=0, N=len(self.dlt),
                                        dl=self.dlt.get_length(docid),
                                        avdl=self.dlt.get_average_length())  # calculate score

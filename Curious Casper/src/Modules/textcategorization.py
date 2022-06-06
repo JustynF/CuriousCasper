@@ -16,13 +16,13 @@ lemma = WordNetLemmatizer()
 #https://appliedmachinelearning.blog/2018/01/18/conventional-approach-to-text-classification-clustering-using-k-nearest-neighbor-k-means-python-implementation/
 class textCategorization():
     def __init__(self):
-        with open('src/output/reuters_corpus.json') as corpus:
+        with open('output/reuters_corpus.json') as corpus:
             self.reuters_corpus = json.load(corpus)
         self.training = [doc for doc in self.reuters_corpus if doc["topic"] != ""]
         self.test = [doc for doc in self.reuters_corpus if doc["topic"] == ""]
         self.topic_labels = list(set(doc["topic"] for doc in self.reuters_corpus if doc["topic"] != ""))
         self.labels = {label: index for index, label in enumerate(self.topic_labels)}
-        with open('src/output/reuters_doc_text.json') as reuters_doc_text:
+        with open('output/reuters_doc_text.json') as reuters_doc_text:
             self.reuters_doc_text = json.load(reuters_doc_text)
 
     def process(self):
@@ -49,14 +49,14 @@ class textCategorization():
                 predicted_labels_knn[index])])
             updated_docs.append(doc)
 
-        with open('src/output/knn_corpus_reuters.json', 'w') as outfile:
+        with open('output/knn_corpus_reuters.json', 'w') as outfile:
             json.dump(self.training + updated_docs,
                       outfile, ensure_ascii=False, indent=4)
 
-        with open('src/output/knn_reuters.json', 'w') as outfile:
+        with open('output/knn_reuters.json', 'w') as outfile:
             json.dump(updated_docs,
                       outfile, ensure_ascii=False, indent=4)
-        with open('src/output/topics.json','w') as outfile:
+        with open('output/topics.json','w') as outfile:
             json.dump(list(set(list_topics)),outfile, ensure_ascii=False, indent=4)
 
 #Taken from clean seaction

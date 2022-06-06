@@ -2,9 +2,10 @@ import json
 import collections
 import nltk
 from nltk import word_tokenize
-from src.Helper.stemmer import stemmer
-from src.Helper.stopwords import remove_stopword
-from src.Helper.normalization import normalize
+from Helper.stemmer import stemmer
+from Helper.stopwords import remove_stopword
+from Helper.normalization import normalize
+
 import string
 import os
 
@@ -39,7 +40,7 @@ class BooleanModel:
         self.mode = "default"
 
     def process_query(self,query,mode):
-        query = [word for word in word_tokenize(query) if word not in string.punctuation]
+       # query = [word for word in word_tokenize(query) if word not in string.punctuation]
         if (mode == "normalize"):
             query_tokens =  normalize(query,True)
             query = " ".join(query_tokens)
@@ -56,7 +57,7 @@ class BooleanModel:
             query_tokens = normalize(query,True)
             query = " ".join(query_tokens)
 
-        print "query "+ query
+        print ("query "+ query)
 
         postfix_queue = self.create_postfix_queue(query)
 
@@ -146,7 +147,7 @@ class BooleanModel:
         ngram = self.create_ngram_model(token, self.inverted_index)
         res = set()
 
-        for _,arr in ngram.iteritems():
+        for _,arr in ngram.items():
             if len(res) == 0:
                 res.update(arr)
             else:
